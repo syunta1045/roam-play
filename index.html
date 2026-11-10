@@ -2277,6 +2277,21 @@ html[lang=ja] #rome-immersive :is(.rr-goal span,.rr-edge,.rr-story,.rs-tip,.rf-c
 #rome-immersive .rr-travel.has-sheet .rt-map-cluster-label{visibility:hidden}
 #rome-immersive .rr-travel .rt-map-stage .rt-origin>span:last-child{font-size:13px;line-height:1.15;text-shadow:0 0 3px #f3ecdb,0 0 2px #f3ecdb}
 #rome-immersive .rr-travel .rt-map-stage .rt-origin{z-index:3}
+/* The price table of 11/10 (「400基準でいいや」): what a plan saves against buying the same cities one by one, and the one plan that saves the most,
+   marked quietly in the card's corner. No clock, no red, nothing that moves. */
+#rome-immersive .rt-pack.is-best::before{content:attr(data-best);position:absolute;z-index:2;top:8px;right:10px;padding:2px 9px;border-radius:999px;background:#ece3cc;color:#5b4a1f;font-size:11px;font-weight:700;letter-spacing:.02em;line-height:1.6;pointer-events:none}
+#rome-immersive .rt-pack.is-best{box-shadow:inset 0 0 0 1.5px #c9b27a}
+#rome-immersive .rt-pack-save{font:inherit;color:inherit}
+/* A city's sheet with three plans (the city, its set, all cities): two side by side, all cities across the row under them. */
+#rome-immersive .rt-ticket-sheet:not([data-mode=shop]) .rt-packs[data-count="3"]{grid-template-columns:repeat(2,minmax(0,1fr))}
+#rome-immersive .rt-ticket-sheet:not([data-mode=shop]) .rt-packs[data-count="3"] .rt-pack:nth-child(3){grid-column:1/-1}
+#rome-immersive .rt-ticket-sheet:not([data-mode=shop]) .rt-packs[data-count="3"] .rt-pack-price{margin-top:auto}
+/* Packs (11/10): the ticket counter lists the cities a ticket can still open, one tap each. */
+#rome-immersive .rt-pick{margin:12px 0 4px}
+#rome-immersive .rt-pick[hidden]{display:none}
+#rome-immersive .rt-pick-title{margin:0 0 8px;font-size:13px;font-weight:650}
+#rome-immersive .rt-pick-cities{display:flex;flex-wrap:wrap;gap:6px}
+#rome-immersive .rt-pick-cities button{min-height:44px;padding:0 14px;border:1px solid #d6d9ce;border-radius:22px;background:#fffdf6;color:var(--ink,#21302a);font-size:13px;font-weight:600}
 </style><style>/* Optional setup is a quiet second choice; every target still reaches 44 pt. */
 #rome-immersive :is(.ob-customize,.ob-later,.ra-later){display:block;width:100%;min-height:44px;margin:8px 0 0;padding:10px 12px;border:0;border-radius:8px;background:transparent;color:var(--ink);font:500 14px/1.5 -apple-system,BlinkMacSystemFont,"Hiragino Sans",sans-serif;text-align:center;cursor:pointer;box-shadow:none}
 #rome-immersive :is(.ob-welcome,.ob-name) :is(.ob-customize,.ob-later){color:#fffdf6}
@@ -3766,7 +3781,7 @@ function updateWallet(){
  if(id){const s=!isBuilt(id)?'soon':hasTicket(id)?'ticket':'locked';state.dataset.state=s;if(s==='soon')state.textContent=T('準備中','Soon');else state.innerHTML=s==='locked'?ticketIcon:planeIcon;}
 }
 // The ticket sheet: spend a ticket on a city, or buy a pack first. id=null is the ticket counter itself.
-let sheetCity=null,ticketBusy=false,sheetOpener=null,stampTimer=0;
+let sheetCity=null,ticketBusy=false,sheetOpener=null,stampTimer=0,pickFromCounter=false;
 const ticketSheet=()=>travelRoot.querySelector('.rt-ticket-sheet');
 const ticketSheetMode=()=>!sheetCity?'shop':!isBuilt(sheetCity)?'soon':hasTicket(sheetCity)?'open':spareTickets>0?'use':'buy';
 function renderTicketSheet(){
@@ -3787,17 +3802,19 @@ function renderTicketSheet(){
  if(to){sheet.querySelector('.rt-ticket-use-label').textContent=T('航空券1枚で{0}へ','Go to {0} · 1 ticket',to.name);sheet.querySelector('.rt-ticket-use-note').hidden=true;}
  const packs=sheet.querySelector('.rt-packs'),list=sheetProducts(),shop=mode==='shop',sign=mode+':'+list.map(p=>p.id).join();
  if(packs.dataset.sign!==sign){packs.dataset.sign=sign;packs.dataset.count=list.length;packs.replaceChildren(...list.map(product=>{
-  const b=document.createElement('button'),art=document.createElement('span'),count=document.createElement('b'),price=document.createElement('span'),n=product.cities.length;
+  const b=document.createElement('button'),art=document.createElement('span'),count=document.createElement('b'),price=document.createElement('span'),n=product.pack||product.cities.length;
   b.type='button';b.className='rt-pack cursor-interaction';b.dataset.pack=product.id;art.className='rt-pack-art';art.setAttribute('aria-hidden','true');price.className='rt-pack-price';
   // A small fan of stubs: one ticket, or one per city of the set.
-  for(let i=0;i<n;i++){const k=i-(n-1)/2;art.insertAdjacentHTML('beforeend',`<svg class="rt-stub" viewBox="0 0 28 18" style="transform:translate(${k*8}px,${Math.abs(k)*1.5}px) rotate(${k*9}deg)"><path d="M3 1h22a2 2 0 0 1 2 2v3.5a2.5 2.5 0 0 0 0 5V15a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3.5a2.5 2.5 0 0 0 0-5V3a2 2 0 0 1 2-2z"/><line x1="19" y1="4" x2="19" y2="14"/></svg>`);}
+  const fan=Math.min(n,5);for(let i=0;i<fan;i++){const k=i-(fan-1)/2;art.insertAdjacentHTML('beforeend',`<svg class="rt-stub" viewBox="0 0 28 18" style="transform:translate(${k*8}px,${Math.abs(k)*1.5}px) rotate(${k*9}deg)"><path d="M3 1h22a2 2 0 0 1 2 2v3.5a2.5 2.5 0 0 0 0 5V15a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-3.5a2.5 2.5 0 0 0 0-5V3a2 2 0 0 1 2-2z"/><line x1="19" y1="4" x2="19" y2="14"/></svg>`);}
   count.textContent=product.single?T('{0}へ','To {0}',destinations[product.cities[0]].name):product.name;
-  const who=document.createElement('small');who.className='rt-pack-cities';who.textContent=product.single?'':product.cities.map(id=>destinations[id].name).join(travelText('・\u200b',', ','、\u200b'));// a city name never breaks in two
+  const who=document.createElement('small');who.className='rt-pack-cities';who.textContent=product.single?'':product.pass?product.line:product.cities.map(id=>destinations[id].name).join(travelText('・\u200b',', ','、\u200b'));// a city name never breaks in two
   // What the money opens, counted over every city of the set.
-  const holds=document.createElement('small');holds.className='rt-pack-holds';holds.textContent=cityHolds(product.cities);
+  const holds=document.createElement('small');holds.className='rt-pack-holds';holds.textContent=product.pack?travelText('航空券{0}枚','{0} tickets','機票{0}張').replace('{0}',product.pack):cityHolds(product.cities);
+  // What a plan saves against the same cities bought one by one, and which plan saves the most: told plainly, with no clock and no red.
+  const save=document.createElement('small');save.className='rt-pack-save';holds.append(save);
   b.append(art,count,who,holds,price);b.addEventListener('click',()=>buyTickets(product,b));
   // In the shop each card shows the cities it opens, a slice of each city's own ticket picture.
-  if(shop){b.classList.toggle('is-single',!!product.single);b.prepend(shopStrip(product.cities));}
+  if(shop){b.classList.toggle('is-single',!!product.single);b.prepend(shopStrip(product.pack?lockedCities().slice(0,product.pack):product.cities));}
   return b;
  }));
   // The cities sold one by one get a quiet heading of their own under the sets.
@@ -3806,16 +3823,28 @@ function renderTicketSheet(){
  }
  renderShopFooter(sheet,mode,list);
  // Prices are read on every render (StoreKit loads them late) and say what the button does; a pending purchase blocks the others without moving focus.
- packs.querySelectorAll('.rt-pack').forEach((b,i)=>{const product=list[i],buy=T('{0}で買う','Buy for {0}',roamStore.price(product.id,product.yen));b.querySelector('.rt-pack-price').textContent=buy;b.setAttribute('aria-label',[b.querySelector('b').textContent,b.querySelector('.rt-pack-cities').textContent,b.querySelector('.rt-pack-holds').textContent,buy].filter(Boolean).join(T('、',', ')));b.setAttribute('aria-disabled',String(ticketBusy));});
+ const saves=list.map(packSaving),best=Math.max(0,...saves);
+ packs.querySelectorAll('.rt-pack').forEach((b,i)=>{const product=list[i],buy=T('{0}で買う','Buy for {0}',roamStore.price(product.id,product.yen)),save=b.querySelector('.rt-pack-save');
+  if(save){save.textContent=saves[i]>=5?travelText(' · 1都市ずつより{0}%お得',' · {0}% less than one by one',' · 比單買便宜{0}%').replace('{0}',saves[i]):'';}
+  b.classList.toggle('is-best',saves[i]>=5&&saves[i]===best&&list.filter((p,k)=>saves[k]===best).length===1);b.dataset.best=travelText('いちばんお得','Best value','最划算');b.querySelector('.rt-pack-price').textContent=buy;b.setAttribute('aria-label',[b.querySelector('b').textContent,b.querySelector('.rt-pack-cities').textContent,b.querySelector('.rt-pack-holds').textContent,buy].filter(Boolean).join(T('、',', ')));b.setAttribute('aria-disabled',String(ticketBusy));});
 }
 // Every city is sold alone, London as much as Prague; a set that still saves money stands beside the single ticket.
 // The shop lists the sets that still pay, then each city no such set covers. Nothing the store cannot sell is offered.
 function sheetProducts(){
  const sold=p=>roamStore.sellable(p.id);
- if(sheetCity)return [productOfCity(sheetCity),...citySets.filter(s=>s.cities.includes(sheetCity)&&setWorthIt(s)).map(productOfSet)].filter(sold);
- const sets=citySets.filter(s=>setWorthIt(s)&&roamStore.sellable('roam.set.'+s.id)),inSet=new Set(sets.flatMap(s=>s.cities));// a set the store does not sell leaves its cities to be sold one by one
- const singles=Object.keys(destinations).filter(id=>isBuilt(id)&&!hasTicket(id)&&!inSet.has(id)).map(productOfCity);
- return [...sets.map(productOfSet),...singles].filter(sold);
+ const passes=cityPasses.filter(passWorthIt).map(productOfPass);
+ const packs=ticketPacks.filter(packWorthIt).map(productOfPack);
+ // A city's sheet: the city, the 3-city pack (this one and two more of your choosing), every city. The regional sets are no longer sold (11/10).
+ if(sheetCity)return [productOfCity(sheetCity),...packs.filter(p=>p.pack===3),...passes.filter(p=>p.id==='roam.pass.cities')].filter(sold);
+ const singles=Object.keys(destinations).filter(id=>isBuilt(id)&&!hasTicket(id)).map(productOfCity);
+ return [...passes,...[...packs].reverse(),...singles].filter(sold);
+}
+// How much less a plan costs than its missing cities one by one, in whole percent, read from the prices the store shows (any currency).
+function priceValue(text){const t=String(text||'').replace(/[^\d.,]/g,'');if(!t)return null;const dot=t.lastIndexOf('.'),comma=t.lastIndexOf(',');let dec=-1;if(dot>-1&&comma>-1)dec=Math.max(dot,comma);else{const k=Math.max(dot,comma);if(k>-1&&t.length-k-1===2)dec=k;}const v=parseFloat((dec>-1?t.slice(0,dec):t).replace(/[.,]/g,'')+(dec>-1?'.'+t.slice(dec+1):''));return Number.isFinite(v)?v:null;}
+function packSaving(product){
+ if(product.single)return 0;
+ const left=product.pack?product.pack:(product.pass?passToday:product.cities).filter(c=>isBuilt(c)&&!tickets.has(c)).length,one=priceValue(roamStore.price('roam.city.'+(lockedCities()[0]||'tokyo'),citySingleYen)),all=priceValue(roamStore.price(product.id,product.yen));
+ if(!left||!one||!all)return 0;return Math.max(0,Math.round((1-all/(left*one))*100));
 }
 // A strip of slices, one per city, cut from each city's own ticket picture. Each picture is shrunk once, one at a time, and the full image let go.
 const shopThumbs=new Map();let shopThumbLine=Promise.resolve();
@@ -3862,7 +3891,7 @@ function openTicketSheet(id=null){
 }
 function closeTicketSheet(focus=true){
  const sheet=ticketSheet();if(sheet.hidden)return false;
- clearTimeout(stampTimer);sheet.hidden=true;sheet.classList.remove('is-stamped','is-buying');travelRoot.classList.remove('has-sheet');sheet.querySelector('.rt-ticket-use').disabled=false;sheetBehind().forEach(el=>el.inert=false);
+ pickFromCounter=false;clearTimeout(stampTimer);sheet.hidden=true;sheet.classList.remove('is-stamped','is-buying');travelRoot.classList.remove('has-sheet');sheet.querySelector('.rt-ticket-use').disabled=false;sheetBehind().forEach(el=>el.inert=false);
  // A city opened just before closing changes the main button, so the select screen is redrawn.
  if(transferState?.stage==='select')updateTransfer(false,false);
  if(focus)(sheetOpener?.isConnected&&!sheetOpener.closest('[hidden]')&&!sheetOpener.closest('[inert]')?sheetOpener:travelRoot.querySelector('.rt-primary')).focus({preventScroll:true});
@@ -3873,7 +3902,10 @@ async function buyTickets(product,button){
  if(ticketBusy||ticketSheet().matches('.is-buying,.is-stamped'))return;ticketBusy=true;button.classList.add('is-busy');renderTicketSheet();
  const before=new Set(tickets);let result=null;try{result=await roamStore.purchase(product.id);}catch(e){}
  ticketBusy=false;button.classList.remove('is-busy');
- if(result?.ok){ownProducts([product.id]);sound.purchase();}
+ if(result?.ok){ownProducts([product.id]);sound.purchase();
+  // A pack bought from a city's sheet: that city is the first of its cities. The rest wait in the ticket counter, to be chosen later.
+  if(product.pack&&sheetCity&&isBuilt(sheetCity)&&!hasTicket(sheetCity)&&spareTickets>0){spareTickets--;tickets.add(sheetCity);persist();updateWallet();}
+  if(product.pack&&spareTickets>0)storeNote(T('あと{0}都市えらべる','{0} more cities to choose',spareTickets));}
  const sheet=ticketSheet(),gained=product.cities.filter(id=>!before.has(id));if(sheet.hidden)return;
  const failed=storeFailText(result),line=sheet.querySelector('.rt-purchase-status');if(failed){line.textContent=failed;line.hidden=false;}
  // Bought for a city: the pass is stamped and the journey goes straight on (no second confirm).
@@ -3896,7 +3928,7 @@ function useTicket(){
 function ticketOpened(id){
  const sheet=ticketSheet(),use=sheet.querySelector('.rt-ticket-use');lastTravelDestination=id;
  use.disabled=true;sheet.classList.add('is-stamped');
- ticketCeremony(id).then(()=>{if(ticketSheet().hidden||sheetCity!==id)return;closeTicketSheet();if(transferState?.stage==='select'&&transferState.destination===id)setTransferStage('route');});
+ ticketCeremony(id).then(()=>{if(ticketSheet().hidden||sheetCity!==id)return;const again=pickFromCounter&&spareTickets>0;pickFromCounter=false;if(again){openTicketSheet(null);return;}closeTicketSheet();if(transferState?.stage==='select'&&transferState.destination===id)setTransferStage('route');});
 }
 
 function renderTravelAccess(sheet,mode){
@@ -3912,6 +3944,12 @@ function renderTravelAccess(sheet,mode){
  if(!spare){spare=document.createElement('p');spare.className='rt-spare-summary';owned.after(spare);}
  spare.hidden=mode!=='shop'||!spareTickets;
  spare.textContent=travelText(`航空券 ${spareTickets}枚・1枚で1都市`,`${spareTickets} tickets · one per city`,`機票 ${spareTickets}張・每張一座城市`);
+ // Choosing (11/10, packs): each city still closed is one tap away; its own sheet then spends the ticket, and the counter comes back while tickets are left.
+ let pick=sheet.querySelector('.rt-pick');
+ if(!pick){pick=document.createElement('div');pick.className='rt-pick';pick.innerHTML='<p class="rt-pick-title"></p><div class="rt-pick-cities"></div>';spare.after(pick);}
+ const choose=mode==='shop'&&spareTickets>0;pick.hidden=!choose;
+ if(choose){pick.querySelector('.rt-pick-title').textContent=T('どの都市にする？','Which city?');
+  pick.querySelector('.rt-pick-cities').replaceChildren(...lockedCities().map(id=>{const b=document.createElement('button');b.type='button';b.className='cursor-interaction';b.textContent=destinations[id].name;b.addEventListener('click',()=>{pickFromCounter=true;openTicketSheet(id);});return b;}));}
 }
 
 // The departure on a small paper globe (route stage). Without WebGL2 nothing changes.
@@ -6664,7 +6702,8 @@ pin.addEventListener('click',destinationAction);view.addEventListener('click',de
 root.querySelectorAll('.rr-edge').forEach(button=>button.addEventListener('click',()=>startDeparture(button.dataset.to))); 
 
 // ---- Purchases and backup. Every paid thing is a NON-CONSUMABLE product, so the store itself remembers it. ----
-// Products: roam.city.<id> (one city, for good), roam.set.<id> (a fixed set of cities), roam.souvenir.<id> (a tee), roam.pet.<kind> (a pet, 11/10), roam.outfit.<id> (clothes).
+// Products: roam.city.<id> (one city, for good), roam.pack.<n> (tickets for n cities of your choosing, each pack once), roam.pass.<id> (every city),
+// roam.set.<id> (a fixed set of cities, no longer sold), roam.souvenir.<id> (a tee), roam.pet.<kind> (a pet, 11/10), roam.outfit.<id> (clothes).
 // Nothing here needs a login. On launch the owned products are read back silently, so a reinstall on the same Apple ID recovers everything;
 // the 購入を復元 button does the same on request (Apple requires the button).
 //
@@ -6704,23 +6743,48 @@ if(new URLSearchParams(location.search).has('new'))try{localStorage.removeItem(S
 
 // Every city is sold alone; the sets are fixed, so what you own can always be worked out from the product ids alone.
 // The three sets take all eleven paid cities at the three price steps of PRICING.md. Tokyo is sold alone, in every language (11/9; destinations.js paidHomeCities).
-// Prices of 11/10 (the owner: 「値段を少しあげよう。450円で3枚は1200円 5枚は2000円」); only shown when the store gives none (the web build).
-const citySingleYen=450;
+// Prices of 11/10, second table (the owner: 「400基準でいいや」); only shown when the store gives none (the web build). 3 and 5 cities are the sets
+// until the owner decides on packs the player fills (PRICING.md).
+const citySingleYen=400;
 const citySets=[
- {id:'asia',cities:['seoul','bangkok','taiwan','singapore','jaipur'],yen:2000,name:T('アジアの5都市','Five cities of Asia')},
- {id:'americas',cities:['newyork','rio','cartagena'],yen:1200,name:T('アメリカ大陸の3都市','Three cities of the Americas')},
- {id:'crossroads',cities:['london','istanbul','dubai'],yen:1200,name:T('ヨーロッパと中東の3都市','Europe to the Gulf, 3 cities')}
+ {id:'asia',cities:['seoul','bangkok','taiwan','singapore','jaipur'],yen:1600,name:T('アジアの5都市','Five cities of Asia')},
+ {id:'americas',cities:['newyork','rio','cartagena'],yen:1000,name:T('アメリカ大陸の3都市','Three cities of the Americas')},
+ {id:'crossroads',cities:['london','istanbul','dubai'],yen:1000,name:T('ヨーロッパと中東の3都市','Europe to the Gulf, 3 cities')}
 ];
+// Every city in one buy (the owner 11/10 「全都市解放プラン+a」): the 21 there are today, or every city including each new one as it comes out.
+// The second is worked out again at every launch from the cities the app has, so a new city in an update is opened by the store's quiet check.
+if(window.ROAM_ZH)Object.assign(window.ROAM_ZH,{'全都市パス':'全城市通行證','いまある21都市すべて':'現有的全部21座城市','全都市＋新都市パス':'全城市＋新城市通行證','全都市と、これから出る新しい都市もすべて':'全部城市，以及今後推出的所有新城市'});
+const passToday=['rome','paris','london','tokyo','seoul','bangkok','dubai','newyork','rio','taiwan','singapore','jaipur','istanbul','cartagena','chongqing','sydney','prague','capetown','marrakech','cairo','la'];
+const cityPasses=[
+ {id:'cities',yen:4800,name:T('全都市パス','All cities pass'),line:T('いまある21都市すべて','All 21 cities there are today')},
+ {id:'future',yen:5800,future:true,name:T('全都市＋新都市パス','All cities + new cities'),line:T('全都市と、これから出る新しい都市もすべて','Every city, and every new city as it comes out')}
+];
+const passCities=p=>p.future?Object.keys(destinations):passToday.filter(id=>Object.hasOwn(destinations,id));
+const productOfPass=p=>({id:'roam.pass.'+p.id,cities:passCities(p),yen:p.yen,name:p.name,line:p.line,pass:true});
+// Packs the player fills (the owner 11/10 「Yes, once each」): 3, 5 or 10 cities of their own choosing, each pack bought once per Apple ID.
+// A pack gives that many tickets to spend on any city (spareTickets, the save's flexible tickets); what was spent is in the save and in iCloud with it.
+// reg.packsGiven says a pack's tickets were handed over, so a launch or a restore never hands them over twice. A reinstall without the old save
+// (no iCloud) gives the pack's tickets back to choose again: nothing paid is lost. The regional sets are no longer sold; owners keep them.
+if(window.ROAM_ZH)Object.assign(window.ROAM_ZH,{'えらべる{0}都市':'任選{0}座城市','好きな{0}都市を選べる':'自選{0}座城市','どの都市にする？':'選哪座城市？','あと{0}都市えらべる':'還能選{0}座城市'});
+const ticketPacks=[{n:3,yen:1000},{n:5,yen:1600},{n:10,yen:3000}];
+const productOfPack=k=>({id:'roam.pack.'+k.n,cities:[],yen:k.yen,name:T('えらべる{0}都市','Any {0} cities',k.n),line:T('好きな{0}都市を選べる','Pick any {0} cities',k.n),pack:k.n});
+const lockedCities=()=>Object.keys(destinations).filter(id=>isBuilt(id)&&!tickets.has(id));
+// A pack is offered until it is yours, and while there are that many cities left to choose from.
+const packWorthIt=k=>!reg?.packsGiven?.[k.n]&&lockedCities().length>=k.n;
+// A pass is offered while it is cheaper than buying what is still missing one by one; the new-city pass alongside the other, until it is yours.
+const passWorthIt=p=>{if(p.future&&reg?.passFuture)return false;const left=passToday.filter(c=>isBuilt(c)&&!tickets.has(c)).length;return left*citySingleYen>cityPasses[0].yen;};
 const productOfCity=id=>({id:'roam.city.'+id,cities:[id],yen:citySingleYen,single:true});
 const productOfSet=s=>({id:'roam.set.'+s.id,cities:s.cities,yen:s.yen,name:s.name});
 // A set is offered only while it is cheaper than buying what is still missing one by one, so nobody pays twice for a city.
 const setWorthIt=s=>{const left=s.cities.filter(c=>isBuilt(c)&&!tickets.has(c)).length;return left>1&&left*citySingleYen>s.yen;};
-const citiesOfProduct=id=>{let m=/^roam\.city\.(.+)$/.exec(id);if(m)return Object.hasOwn(destinations,m[1])?[m[1]]:[];m=/^roam\.set\.(.+)$/.exec(id);return citySets.find(s=>s.id===m?.[1])?.cities||[];};
+const citiesOfProduct=id=>{let m=/^roam\.city\.(.+)$/.exec(id);if(m)return Object.hasOwn(destinations,m[1])?[m[1]]:[];m=/^roam\.pass\.(.+)$/.exec(id);if(m){const p=cityPasses.find(x=>x.id===m[1]);return p?passCities(p):[];}m=/^roam\.set\.(.+)$/.exec(id);return citySets.find(s=>s.id===m?.[1])?.cities||[];};
 // Everything owned according to the store goes into the save. Returns how many things were new.
 function ownProducts(ids){
  let gained=0;
  for(const id of ids||[]){
   for(const c of citiesOfProduct(id))if(!tickets.has(c)){tickets.add(c);gained++;}
+  if(id==='roam.pass.future'&&reg&&!reg.passFuture){reg.passFuture=1;gained++;}
+  const k=/^roam\.pack\.(\d+)$/.exec(id),pack=k&&ticketPacks.find(x=>x.n===+k[1]);if(pack&&reg&&!reg.packsGiven?.[pack.n]){reg.packsGiven={...(reg.packsGiven||{}),[pack.n]:1};spareTickets=Math.min(999,spareTickets+pack.n);gained++;}
   const m=/^roam\.souvenir\.(.+)$/.exec(id);if(m&&typeof souvenirOwn==='function'&&souvenirOwn(m[1]))gained++;
   const p=/^roam\.pet\.(.+)$/.exec(id);if(p&&typeof petOwn==='function'&&petOwn(p[1]))gained++;
   // Clothes (roam-r7-fx, js/outfits.js): a set brings both of its pieces.
