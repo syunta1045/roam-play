@@ -14,13 +14,35 @@ jobs:
   deploy:
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: https://syunta1045.github.io/roam-play/
     runs-on: ubuntu-latest
+    timeout-minutes: 70
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - id: upload
+        uses: actions/upload-pages-artifact@v3
         with:
           path: .
-      - id: deployment
-        uses: actions/deploy-pages@v4
+      # actions/deploy-pages gives up and cancels after 10 minutes, and this 660 MB site
+      # has sat in "syncing_files" longer than that. Same API calls, but wait up to 60 minutes.
+      - name: Deploy and wait
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_ID: ${{ steps.upload.outputs.artifact_id }}
+        run: |
+          set -eu
+          OIDC=$(curl -sSf -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL" | jq -r .value)
+          RES=$(gh api -X POST "repos/$GITHUB_REPOSITORY/pages/deployments" -F artifact_id="$ARTIFACT_ID" -f pages_build_version="$GITHUB_SHA" -f oidc_token="$OIDC")
+          echo "$RES" | jq '{id, status_url, page_url}'
+          ID=$(echo "$RES" | jq -r '.id // (.status_url | split("/") | last)')
+          for i in $(seq 1 360); do
+            S=$(gh api "repos/$GITHUB_REPOSITORY/pages/deployments/$ID" --jq .status 2>/dev/null || echo api_error)
+            echo "$(date -u +%H:%M:%S) $S"
+            case "$S" in
+              succeed) exit 0 ;;
+              deployment_failed|deployment_content_failed|deployment_cancelled|deployment_lost|deployment_perms_error) exit 1 ;;
+            esac
+            sleep 10
+          done
+          echo "Not finished after 60 minutes"; exit 1
