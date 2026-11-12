@@ -2898,6 +2898,8 @@ Object.assign(window.ROAM_ZH,{"。":"。","":""}); // trip screens: the stage la
 Object.assign(window.ROAM_ZH,{"次は{0}":"下一站：{0}","ぜんぶ見た":"全部看過了","撮る":"拍照","街の地図":"城市地圖"}); // 11/7 UI/UX pass
 // 11/12: Chinese for what still showed in English (eval-1112 #10, the map ✕ "Back to traveller"): close and back labels, the credits' sound and music names, photo and purchase messages. The HUD buttons labelled at load are here too, ahead of the files that add them later. Machine translated, NO NATIVE SPEAKER HAS READ THIS.
 Object.assign(window.ROAM_ZH,{"空港ターミナル（ヒースロー）":"機場航廈（希斯洛）","パリ・シテ島のセーヌ河岸":"巴黎西堤島的塞納河岸","イタリアの街のざわめき（ミラノ）":"義大利街頭的喧鬧（米蘭）","バンコク中心部の通り":"曼谷市中心的街道","コロンビア・モンポスの作業場":"哥倫比亞蒙波斯的工坊","ドバイ・デイラのスーク":"杜拜德拉的市集","イスタンブールの街":"伊斯坦堡街頭","インドの道路（ケーララ）":"印度的道路（喀拉拉）","ロンドン・テムズ河岸":"倫敦泰晤士河畔","ニューヨーク・セントラルパーク":"紐約中央公園","ポルトガル語の街のざわめき（リスボン）":"葡萄牙語街頭的喧鬧（里斯本）","韓国の広場（金海）":"韓國的廣場（金海）","シンガポールのチャイナタウン":"新加坡牛車水","台北・北投の市場":"台北北投的市場","東京・六本木の高所からの街音":"從東京六本木高處聽見的街聲","波（熱帯の浜辺）":"海浪（熱帶海灘）","次は {0}へ":"下一站：{0}","坂の町では、荷を担ぐ人が階段を上り下りした。":"在坡道之城，挑夫扛著貨物在階梯上上下下。","ドームの穴から落ちた雨のしずく":"從圓頂天窗落下的雨滴","雨の日は、ドームの丸い穴から床まで雨が降る。穴は今も空に開いたまま。":"下雨天，雨從圓頂的圓洞一路落到地面。那個洞至今仍向天空敞開。","雨の日だけ":"只在雨天","・雨の日だけ":"・只在雨天","写真、ぜんぶ大事にする。":"照片我都會好好珍藏。","石畳をタップして、{0}の街を歩く":"點一下石板路，在{0}的街上走走","はじまり":"開場","旅の移動":"旅途移動","パリ（夜）":"巴黎（夜）","ニューヨーク（夜）":"紐約（夜）","帽子なし":"不戴帽子","預かりもの":"包裹","カメラで自分の顔を撮る":"用相機拍自己的臉","写真はこの端末だけに保存。送信しません。":"照片只存在這台裝置上，不會上傳。","写真を読み込めませんでした。もう一度試してください。":"無法讀取照片，請再試一次。","この端末に写真を保存できませんでした。":"無法將照片存到這台裝置。","いつでも行ける街":"隨時可以去的城市","{0}の絵":"{0}的畫","絵を読み込んでいます…":"正在載入畫面…","どこに行きますか？":"想去哪裡呢？","もらった切符で{0}へ":"用收到的機票前往{0}","航空券を使って{0}へ":"使用機票前往{0}","旅人に戻る":"回到旅人","操作音":"操作音效","ROAM制作・アプリ内生成（商用利用可）":"ROAM 製作・App 內生成（可商用）","{0}で\n買える":"在{0}\n買得到","承認待ち":"等待核准","買えなかった。もう一度":"購買失敗，請再試一次","復元できなかった。もう一度":"恢復失敗，請再試一次","近づいて話す":"走近打招呼","着替え・ペット・撮る・設定":"換裝・寵物・拍照・設定","着替え":"換裝","ホテルの部屋":"旅館房間","、":"、","NY":"紐約","（{0}）":"（{0}）"});
+// 11/12 night: the twelve 準備中 cities on the world map (the owner 「いますぐに準備中にしてください」) and their region. Machine translated, NO NATIVE SPEAKER HAS READ THIS.
+Object.assign(window.ROAM_ZH,{"バクー":"巴庫","アゼルバイジャン":"亞塞拜然","アテネ":"雅典","ギリシャ":"希臘","バルセロナ":"巴塞隆納","スペイン":"西班牙","ケベック・シティー":"魁北克市","カナダ":"加拿大","メキシコシティ":"墨西哥城","メキシコ":"墨西哥","サンホセ":"聖荷西","コスタリカ":"哥斯大黎加","クスコ":"庫斯科","ペルー":"秘魯","ブエノスアイレス":"布宜諾斯艾利斯","アルゼンチン":"阿根廷","ウブド":"烏布","インドネシア":"印尼","サマルカンド":"撒馬爾罕","ウズベキスタン":"烏茲別克","ドゥアラ":"杜阿拉","カメルーン":"喀麥隆","ラリベラ":"拉利貝拉","エチオピア":"衣索比亞","中央アジア・コーカサス":"中亞・高加索"});
 </script>
 <style>/* R13 案3: the line that says which sight a search found (名所：ギザの大ピラミッド), and rows that grow to hold it (js/r13-search.js).
    A row is as tall as its words (82 px at least), so a second or third line, or the large text size, is never cut off; the
@@ -3593,7 +3595,21 @@ const destinations={
  capetown:{lon:18.4241,lat:-33.9249,region:'AFRICA'},
  marrakech:{lon:-7.9811,lat:31.6295,region:'AFRICA'},
  la:{lon:-118.2437,lat:34.0522,region:'NORTH AMERICA'},
- cairo:{lon:31.2357,lat:30.0444,region:'AFRICA'}
+ cairo:{lon:31.2357,lat:30.0444,region:'AFRICA'},
+ // 準備中 only (the owner 11/12 「いますぐに準備中にしてください」): no streets yet, so isBuilt is false and they cannot be chosen or bought.
+ // The city for each country is the coordinator's proposal and may change.
+ baku:{title:'Baku',name:T('バクー','Baku'),country:T('アゼルバイジャン','Azerbaijan'),countryEn:'AZERBAIJAN',mapCountry:'AZE',airport:'GYD',lon:49.8671,lat:40.4093,region:'CENTRAL ASIA'},
+ athens:{title:'Athens',name:T('アテネ','Athens'),country:T('ギリシャ','Greece'),countryEn:'GREECE',mapCountry:'GRC',airport:'ATH',lon:23.7275,lat:37.9838,region:'EUROPE'},
+ barcelona:{title:'Barcelona',name:T('バルセロナ','Barcelona'),country:T('スペイン','Spain'),countryEn:'SPAIN',mapCountry:'ESP',airport:'BCN',lon:2.1686,lat:41.3874,region:'EUROPE'},
+ quebec:{title:'Québec City',name:T('ケベック・シティー','Québec City'),country:T('カナダ','Canada'),countryEn:'CANADA',mapCountry:'CAN',airport:'YQB',lon:-71.208,lat:46.8139,region:'NORTH AMERICA'},
+ mexicocity:{title:'Mexico City',name:T('メキシコシティ','Mexico City'),country:T('メキシコ','Mexico'),countryEn:'MEXICO',mapCountry:'MEX',airport:'MEX',lon:-99.1332,lat:19.4326,region:'NORTH AMERICA'},
+ sanjose:{title:'San José',name:T('サンホセ','San José'),country:T('コスタリカ','Costa Rica'),countryEn:'COSTA RICA',mapCountry:'CRI',airport:'SJO',lon:-84.0907,lat:9.9281,region:'CENTRAL AMERICA'},
+ cusco:{title:'Cusco',name:T('クスコ','Cusco'),country:T('ペルー','Peru'),countryEn:'PERU',mapCountry:'PER',airport:'CUZ',lon:-71.9675,lat:-13.532,region:'SOUTH AMERICA'},
+ buenosaires:{title:'Buenos Aires',name:T('ブエノスアイレス','Buenos Aires'),country:T('アルゼンチン','Argentina'),countryEn:'ARGENTINA',mapCountry:'ARG',airport:'EZE',lon:-58.3816,lat:-34.6037,region:'SOUTH AMERICA'},
+ ubud:{title:'Ubud',name:T('ウブド','Ubud'),country:T('インドネシア','Indonesia'),countryEn:'INDONESIA',mapCountry:'IDN',airport:'DPS',lon:115.2625,lat:-8.5069,region:'SOUTHEAST ASIA'},
+ samarkand:{title:'Samarkand',name:T('サマルカンド','Samarkand'),country:T('ウズベキスタン','Uzbekistan'),countryEn:'UZBEKISTAN',mapCountry:'UZB',airport:'SKD',lon:66.975,lat:39.627,region:'CENTRAL ASIA'},
+ douala:{title:'Douala',name:T('ドゥアラ','Douala'),country:T('カメルーン','Cameroon'),countryEn:'CAMEROON',mapCountry:'CMR',airport:'DLA',lon:9.7679,lat:4.0511,region:'AFRICA'},
+ lalibela:{title:'Lalibela',name:T('ラリベラ','Lalibela'),country:T('エチオピア','Ethiopia'),countryEn:'ETHIOPIA',mapCountry:'ETH',airport:'LLI',lon:39.0473,lat:12.0317,region:'AFRICA'}
 };
 for(const [id,c] of Object.entries(cities))Object.assign(destinations[id],{title:c.title,name:c.mapName||c.name,country:c.countryJa,countryEn:c.countryEn,mapCountry:c.mapCountry,airport:c.airport});
 const destinationRegions=[
@@ -3602,6 +3618,7 @@ const destinationRegions=[
  ['southeast-asia','東南アジア','Southeast Asia',['SOUTHEAST ASIA']],
  ['south-asia','南アジア','South Asia',['SOUTH ASIA']],
  ['middle-east','中東','Middle East',['MIDDLE EAST']],
+ ['central-asia','中央アジア・コーカサス','Central Asia & Caucasus',['CENTRAL ASIA']],
  ['americas','南北アメリカ','Americas',['AMERICAS','NORTH AMERICA','CENTRAL AMERICA','SOUTH AMERICA']],
  ['africa','アフリカ','Africa',['AFRICA']],
  ['oceania','オセアニア','Oceania',['OCEANIA']]
@@ -3846,7 +3863,7 @@ let mapIds=[],mapWide=false,travelRegion='world',travelSteer=false;
 const travelRegions=[
  ['world',['世界','World','世界'],null],
  ['europe',['ヨーロッパ','Europe','歐洲'],['EUROPE']],
- ['asia',['アジア・中東','Asia & Middle East','亞洲・中東'],['ASIA','SOUTHEAST ASIA','SOUTH ASIA','MIDDLE EAST']],
+ ['asia',['アジア・中東','Asia & Middle East','亞洲・中東'],['ASIA','SOUTHEAST ASIA','SOUTH ASIA','MIDDLE EAST','CENTRAL ASIA']],
  ['americas',['南北アメリカ','Americas','美洲'],['AMERICAS','NORTH AMERICA','CENTRAL AMERICA','SOUTH AMERICA']]
 ];
 // R9 (owner 11/9 「ここがおかしいかな」): one small paper track instead of four boxed buttons, and a dark mark that always sits on the
@@ -4246,7 +4263,7 @@ function mapGroups(pins,origin){
  }
 }
 // Two cities by name; more by their part of the world (two at most), with how many.
-const clusterParts={europe:['ヨーロッパ','Europe','歐洲'],'east-asia':['アジア','Asia','亞洲'],'southeast-asia':['アジア','Asia','亞洲'],'south-asia':['アジア','Asia','亞洲'],'middle-east':['中東','Middle East','中東'],americas:['南北アメリカ','Americas','美洲'],africa:['アフリカ','Africa','非洲'],oceania:['オセアニア','Oceania','大洋洲']};
+const clusterParts={europe:['ヨーロッパ','Europe','歐洲'],'east-asia':['アジア','Asia','亞洲'],'southeast-asia':['アジア','Asia','亞洲'],'south-asia':['アジア','Asia','亞洲'],'middle-east':['中東','Middle East','中東'],'central-asia':['アジア','Asia','亞洲'],americas:['南北アメリカ','Americas','美洲'],africa:['アフリカ','Africa','非洲'],oceania:['オセアニア','Oceania','大洋洲']};
 function clusterName(ids){
  // Two names stack, the northern one on top.
  if(ids.length===2)return [...ids].sort((a,b)=>destinations[b].lat-destinations[a].lat).map(id=>destinations[id].name).join('\n');
@@ -4729,10 +4746,10 @@ function updateWallet(){
   const id=b.dataset.country,name=destinations[id].name;b.toggleAttribute('data-free',free.includes(id));
   b.setAttribute('aria-checked',String(transferState?.destination===id));
   b.dataset.state=!isBuilt(id)?'soon':hasTicket(id)?'ticket':'locked';
-  {const s=b.querySelector('small');s.textContent=isBuilt(id)?destinations[id].country:T('準備中','Soon');if(isBuilt(id))s.append(todMark(todAt(id),regLabelTod(id)));}
+  {const s=b.querySelector('small');s.textContent=destinations[id].country||T('準備中','Soon');if(isBuilt(id))s.append(todMark(todAt(id),regLabelTod(id)));}
   const access=!isBuilt(id)?T('準備中','Soon'):free.includes(id)?freeWord():hasTicket(id)?travelText('いつでも行ける','Ready to visit','隨時可前往'):spareTickets>0?travelText('航空券で開く','Use a ticket','使用機票開放'):travelText('未購入','Not purchased','尚未購買');
   b.querySelector('.rt-destination-access').textContent=access;
-  b.setAttribute('aria-label',name+' · '+access+' · '+regLabelTod(id));
+  b.setAttribute('aria-label',name+' · '+access+(hasStreets(id)?' · '+regLabelTod(id):''));// a city with no streets has no clock (cities[id].zone)
  });
  // The map itself says what is yours: filled pin to fly to, hollow still to buy, gold walked to the end.
  travelRoot.querySelectorAll('.rt-map-city').forEach(b=>{const id=b.dataset.country;b.dataset.state=!isBuilt(id)?'soon':!hasTicket(id)?'locked':cities[id].tour.every(p=>visited.has(p))?'done':'open';});
@@ -4796,6 +4813,8 @@ function sheetProducts(){
  const passes=cityPasses.filter(passWorthIt).map(productOfPass);
  const packs=ticketPacks.filter(packWorthIt).map(productOfPack);
  // A city's sheet: the city, the 3-city pack (this one and two more of your choosing), every city. The regional sets are no longer sold (11/10).
+ // A city still 準備中 sells nothing of its own: only a pass that already brings it (the owner 11/12, the twelve new cities).
+ if(sheetCity&&!isBuilt(sheetCity))return passes.filter(p=>p.cities.includes(sheetCity)).filter(sold);
  if(sheetCity)return [productOfCity(sheetCity),...packs.filter(p=>p.pack===3),...passes.filter(p=>p.id==='roam.pass.cities')].filter(sold);
  const singles=Object.keys(destinations).filter(id=>isBuilt(id)&&!hasTicket(id)).sort(byRegion).map(productOfCity);
  return [...passes,...[...packs].reverse(),...singles].filter(sold);
@@ -4810,6 +4829,7 @@ function packSaving(product){
 // A strip of slices, one per city, cut from each city's own ticket picture. Each picture is shrunk once, one at a time, and the full image let go.
 const shopThumbs=new Map();let shopThumbLine=Promise.resolve();
 function shopThumb(id){
+ if(!hasStreets(id))return Promise.resolve('');// a city with no streets has no picture yet: its slice keeps its quiet tone (and a throw here would stop every slice after it)
  if(!shopThumbs.has(id))shopThumbs.set(id,shopThumbLine=shopThumbLine.then(()=>new Promise(done=>{
   const paint=img=>{try{const c=document.createElement('canvas'),w=c.width=240,h=c.height=160,x=c.getContext('2d'),iw=img.naturalWidth,ih=img.naturalHeight,crop=Math.min(ih*.62,iw*h/w),cw=crop*w/h;x.imageSmoothingQuality='high';x.drawImage(img,(iw-cw)/2,0,cw,crop,0,0,w,h);return c.toDataURL('image/jpeg',.82);}catch(e){return '';}};
   const held=cityArt[id];if(held?.complete&&held.naturalWidth)return done(paint(held));
